@@ -1,29 +1,74 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-class CalculoRequest(BaseModel):
+
+class TextInput(BaseModel):
     """
-    Modelo de entrada - ADAPTE para seu projeto!
+    Modelo de entrada para criptografar um texto.
     """
-    valor1: float
-    valor2: float
-    
+    text: str = Field(..., min_length=10, description="Texto que será criptografado. Deve conter pelo menos 10 caracteres.")
+    crypto_type: str = Field(..., description="Tipo de criptografia a ser utilizada (ex: 'fernet').")
+    length: int = Field(..., description="Comprimento do texto informado. Para validação ou metadados.")
+
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
-                "valor1": 10.0,
-                "valor2": 20.0
+                "text": "Texto de exemplo para criptografia",
+                "crypto_type": "fernet",
+                "length": 34
             }
         }
 
-class CalculoResponse(BaseModel):
+
+class TextOutput(BaseModel):
     """
-    Modelo de saída - ADAPTE para seu projeto!
+    Modelo de saída para dados criptografados.
     """
-    resultado: float
-    
+    token: str = Field(..., description="Texto criptografado.")
+    crypto_type: str = Field(..., description="Tipo de criptografia aplicada.")
+    version: str = Field(..., description="Versão da API.")
+
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
-                "resultado": 30.0
+                "token": "gAAAAABlYwK9oU1k3H...",
+                "crypto_type": "fernet",
+                "version": "1.0.0"
+            }
+        }
+
+
+class TokenInput(BaseModel):
+    """
+    Modelo de entrada para descriptografar um token.
+    """
+    token: str = Field(
+        ...,
+        description="Token criptografado que será descriptografado."
+    )
+    length: int = Field(..., description="Comprimento do token. Opcionalmente usado para validação.")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "token": "gAAAAABlYwK9oU1k3H...",
+                "length": 140
+            }
+        }
+
+
+class TokenOutput(BaseModel):
+    """
+    Modelo de saída para retornar o texto descriptografado.
+    """
+    text: str = Field(..., description="Texto descriptografado.")
+    crypto_type: str = Field(..., description="Tipo de criptografia utilizada.")
+    version: str = Field(..., description="Versão da API.")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "text": "Texto de exemplo já descriptografado",
+                "crypto_type": "fernet",
+                "version": "1.0.0"
             }
         }
