@@ -5,8 +5,8 @@ from src.models.schemas import TextInput, TextOutput, TokenInput, TokenOutput
 # INSTÂNCIA DA API =====================================================
 app = FastAPI(
     title=settings.app_name,
-    description=settings.app_description, 
-    version=settings.app_version
+    description=settings.app_description,
+    version=settings.app_version,
 )
 
 
@@ -17,10 +17,8 @@ def root():
     Endpoint raiz da API
     """
     logger.info("Endpoint raiz acessado")
-    return {
-        "message": "Bem-vindo à SecureCipher API!",
-        "version": settings.app_version
-    }
+    return {"message": "Bem-vindo à SecureCipher API!", "version": settings.app_version}
+
 
 @app.get("/health")
 def health_check():
@@ -28,40 +26,51 @@ def health_check():
     Endpoint de health check
     """
     logger.info("Health check realizado")
-    return {
-        "status": "healthy", 
-        "version": settings.app_version}
+    return {"status": "healthy", "version": settings.app_version}
 
 
-# PAREI DE REVISAR AQUI XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 @app.post("/encrypt")
 def encrypt_text(data: TextInput) -> TextOutput:
     """Endpoint responsável por criptografar o texto informado."""
+    logger.info(
+        "Solicitação de criptografia recebida",
+        extra={
+            "crypto_type": data.crypto_type,
+            "text": data.text,
+            "length": data.length,
+        },
+    )
+
     try:
         encrypted = cipher.encrypt(data.text.encode())
         return TextOutput(
             token=encrypted.decode(),
             crypto_type=settings.app_crypto_type,
-            version=settings.app_version
+            version=settings.app_version,
         )
     except Exception as e:
+        logger.warning("Erro ao criptografar o texto")
         raise HTTPException(
-            status_code=500,
-            detail=f"Erro ao criptografar o texto: {str(e)}"
+            status_code=500, detail=f"Erro ao criptografar o texto: {str(e)}"
         )
+
 
 @app.post("/decrypt")
 def decrypt_text(data: TokenInput) -> TokenOutput:
     """Endpoint para descriptografia do token informado para texto claro"""
+    logger.info(
+        "Solicitação de descriptografia recebida",
+        extra={"token": data.token, "length": data.length},
+    )
     try:
         decrypted = cipher.decrypt(data.token.encode())
         return TokenOutput(
             text=decrypted.decode(),
             crypto_type=settings.app_crypto_type,
-            version=settings.app_version
+            version=settings.app_version,
         )
     except Exception:
+        logger.warning("Erro ao descriptografar o token")
         raise HTTPException(
-            status_code=400,
-            detail="Token inválido ou não pode ser descriptografado."
+            status_code=400, detail="Token inválido ou não pode ser descriptografado."
         )

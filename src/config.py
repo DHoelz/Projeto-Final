@@ -3,23 +3,27 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from cryptography.fernet import Fernet
 
+
 # CONFIGURAÇÕES GERAIS =================================================
 class Settings(BaseSettings):
     app_name: str = "SecureCipher API"
     app_version: str = "1.0.0"
-    app_description: str = "API que criptografa e decriptografa textos usando Fernet e chave via " \
-    "variável de ambiente"
+    app_description: str = (
+        "API que criptografa e decriptografa textos usando Fernet e chave via "
+        "variável de ambiente"
+    )
     app_crypto_type: str = "Fernet"
     crypto_key: str
     debug: bool = False
-    
-    model_config = SettingsConfigDict(env_file=".env") 
+
+    model_config = SettingsConfigDict(env_file=".env")
+
 
 settings = Settings()
 
 
 # VERIFICAÇÃO DA CHAVE CRIPTOGRÁFICA + INSTÂNCIA DO FERNET =============
-try: 
+try:
     cipher = Fernet(settings.crypto_key.encode())
 except Exception:
     raise RuntimeError(
@@ -42,17 +46,17 @@ def setup_logging():
     """
     # Evita logs duplicados devido ao --reload do Uvicorn
     root_logger = logging.getLogger()
-    root_logger.handlers.clear()  
+    root_logger.handlers.clear()
 
     logging.basicConfig(
         level=LOG_LEVEL,
         format=LOG_FORMAT,
         handlers=[
             logging.FileHandler(LOG_DIR / "app.log", encoding="utf-8"),
-            logging.StreamHandler()
-        ]
+            logging.StreamHandler(),
+        ],
     )
-    
+
     return logging.getLogger("securecipher")
 
 
