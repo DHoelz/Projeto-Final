@@ -1,42 +1,39 @@
-import os, sys
+from src.config import logger, cipher, settings
 from fastapi import FastAPI, HTTPException
-from cryptography.fernet import Fernet
-import logging
-from dotenv import load_dotenv
+from src.models.schemas import TextInput, TextOutput, TokenInput, TokenOutput
 
-# Carrega o .env ANTES de qualquer outra coisa
-load_dotenv()
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
-
-from config import settings
-from models.schemas import TextInput, TextOutput, TokenInput, TokenOutput
-
-# Configuração de logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
+# INSTÂNCIA DA API =====================================================
 app = FastAPI(
     title=settings.app_name,
     description=settings.app_description, 
     version=settings.app_version
 )
 
-# Carrega a chave criptográfica do .env
-def load_crypto_key():
-    key = os.getenv("CRYPTO_KEY")
-    if not key:
-        raise ValueError("CRYPTO_KEY não encontrada no arquivo .env")
-    return key.encode()
 
-KEY = load_crypto_key()
-cipher = Fernet(KEY)
-
+# ENDPOINTS ============================================================
 @app.get("/")
-def health_check():
-    """Endpoint de health check"""
-    return {"status": True, "message": "API funcionando"}
+def root():
+    """
+    Endpoint raiz da API
+    """
+    logger.info("Endpoint raiz acessado")
+    return {
+        "message": "Bem-vindo à SecureCipher API!",
+        "version": settings.app_version
+    }
 
+@app.get("/health")
+def health_check():
+    """
+    Endpoint de health check
+    """
+    logger.info("Health check realizado")
+    return {
+        "status": "healthy", 
+        "version": settings.app_version}
+
+
+# PAREI DE REVISAR AQUI XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 @app.post("/encrypt")
 def encrypt_text(data: TextInput) -> TextOutput:
     """Endpoint responsável por criptografar o texto informado."""
