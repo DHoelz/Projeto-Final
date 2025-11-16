@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from cryptography.fernet import Fernet
 
 
 # CONFIGURAÇÕES GERAIS =================================================
@@ -13,23 +12,18 @@ class Settings(BaseSettings):
         "variável de ambiente"
     )
     app_crypto_type: str = "Fernet"
-    crypto_key: str
+    # tornar todas as variantes de chave opcionais para que o Settings aceite
+    # CRYPTO_KEY_FERNET, CRYPTO_KEY_AES256, CRYPTO_KEY_CHACHA20
+    crypto_key_fernet: str | None = None
+    crypto_key_aes256: str | None = None
+    crypto_key_chacha20: str | None = None
     debug: bool = False
 
-    model_config = SettingsConfigDict(env_file=".env")
+    # carrega do .env e permite variáveis extras (não ignorar)
+    model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
 
 settings = Settings()
-
-
-# VERIFICAÇÃO DA CHAVE CRIPTOGRÁFICA + INSTÂNCIA DO FERNET =============
-try:
-    cipher = Fernet(settings.crypto_key.encode())
-except Exception:
-    raise RuntimeError(
-        "Erro ao carregar a CRYPTO_KEY do .env. "
-        "Verifique se a chave está correta e no formato base64 do Fernet."
-    )
 
 
 # CONFIGURAÇÕES DE LOGGING =============================================

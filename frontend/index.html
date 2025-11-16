@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 SecureCipher API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1em;
+            color: #999;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        select,
+        textarea,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        select:focus,
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .result-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .result-text {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .copy-button {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #764ba2;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #e74c3c;
+            padding: 12px;
+            background: #fadbd8;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .success {
+            color: #27ae60;
+            padding: 12px;
+            background: #d5f4e6;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #27ae60;
+        }
+
+        .success.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 SecureCipher</h1>
+            <p>Criptografe e descriptografe seus textos com segurança</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('encrypt')">
+                🔒 Criptografar
+            </button>
+            <button class="tab-button" onclick="switchTab('decrypt')">
+                🔓 Descriptografar
+            </button>
+        </div>
+
+        <!-- ABA CRIPTOGRAFAR -->
+        <div id="encrypt" class="tab-content active">
+            <form onsubmit="handleEncrypt(event)">
+                <div class="form-group">
+                    <label for="encryptType">Tipo de Criptografia</label>
+                    <select id="encryptType" required>
+                        <option value="Fernet">🔐 Fernet (Recomendado)</option>
+                        <option value="AES-GCM">🔒 AES-256-GCM</option>
+                        <option value="ChaCha20-Poly1305">⚡ ChaCha20-Poly1305</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="encryptText">Texto para Criptografar</label>
+                    <textarea id="encryptText" placeholder="Digite o texto que deseja criptografar..." required></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Criptografar</button>
+                    <button type="reset" class="btn-secondary">Limpar</button>
+                </div>
+
+                <div class="loading" id="encryptLoading">
+                    <span class="spinner"></span> Criptografando...
+                </div>
+
+                <div class="error" id="encryptError"></div>
+                <div class="success" id="encryptSuccess">✓ Criptografado com sucesso!</div>
+
+                <div class="result" id="encryptResult">
+                    <div class="result-title">Token Criptografado:</div>
+                    <div class="result-text" id="encryptResultText"></div>
+                    <button type="button" class="copy-button" onclick="copyToClipboard('encryptResultText')">
+                        📋 Copiar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ABA DESCRIPTOGRAFAR -->
+        <div id="decrypt" class="tab-content">
+            <form onsubmit="handleDecrypt(event)">
+                <div class="form-group">
+                    <label for="decryptType">Tipo de Criptografia</label>
+                    <select id="decryptType" required>
+                        <option value="Fernet">🔐 Fernet</option>
+                        <option value="AES-GCM">🔒 AES-256-GCM</option>
+                        <option value="ChaCha20-Poly1305">⚡ ChaCha20-Poly1305</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="decryptToken">Token Criptografado</label>
+                    <textarea id="decryptToken" placeholder="Cole o token criptografado aqui..." required></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Descriptografar</button>
+                    <button type="reset" class="btn-secondary">Limpar</button>
+                </div>
+
+                <div class="loading" id="decryptLoading">
+                    <span class="spinner"></span> Descriptografando...
+                </div>
+
+                <div class="error" id="decryptError"></div>
+                <div class="success" id="decryptSuccess">✓ Descriptografado com sucesso!</div>
+
+                <div class="result" id="decryptResult">
+                    <div class="result-title">Texto Descriptografado:</div>
+                    <div class="result-text" id="decryptResultText"></div>
+                    <button type="button" class="copy-button" onclick="copyToClipboard('decryptResultText')">
+                        📋 Copiar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        const API_BASE = "http://localhost:8000";
+
+        function switchTab(tabName) {
+            document.querySelectorAll(".tab-content").forEach(tab => {
+                tab.classList.remove("active");
+            });
+            document.querySelectorAll(".tab-button").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            document.getElementById(tabName).classList.add("active");
+            event.target.classList.add("active");
+        }
+
+        async function handleEncrypt(e) {
+            e.preventDefault();
+
+            const text = document.getElementById("encryptText").value;
+            const cryptoType = document.getElementById("encryptType").value;
+
+            const loading = document.getElementById("encryptLoading");
+            const error = document.getElementById("encryptError");
+            const success = document.getElementById("encryptSuccess");
+            const result = document.getElementById("encryptResult");
+
+            loading.style.display = "block";
+            error.classList.remove("show");
+            success.classList.remove("show");
+            result.classList.remove("show");
+
+            try {
+                const payload = {
+                    text: text,
+                    crypto_type: cryptoType,
+                    length: text.length
+                };
+                console.log("Enviando:", payload);
+                
+                const response = await fetch(`${API_BASE}/encrypt`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const responseData = await response.json();
+                console.log("Resposta recebida:", responseData);
+                console.log("Status:", response.status);
+
+                if (!response.ok) {
+                    let errorMsg = "Erro ao criptografar";
+                    if (responseData.detail) {
+                        if (Array.isArray(responseData.detail)) {
+                            errorMsg = responseData.detail.map(e => e.msg).join(", ");
+                        } else {
+                            errorMsg = responseData.detail;
+                        }
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                document.getElementById("encryptResultText").textContent = responseData.token;
+                success.classList.add("show");
+                result.classList.add("show");
+            } catch (err) {
+                error.textContent = "❌ " + err.message;
+                error.classList.add("show");
+                console.error("Erro detalhado:", err);
+            } finally {
+                loading.style.display = "none";
+            }
+        }
+
+        async function handleDecrypt(e) {
+            e.preventDefault();
+
+            const token = document.getElementById("decryptToken").value;
+            const cryptoType = document.getElementById("decryptType").value;
+
+
+            const loading = document.getElementById("decryptLoading");
+            const error = document.getElementById("decryptError");
+            const success = document.getElementById("decryptSuccess");
+            const result = document.getElementById("decryptResult");
+
+            loading.style.display = "block";
+            error.classList.remove("show");
+            success.classList.remove("show");
+            result.classList.remove("show");
+
+            try {
+                const payload = {
+                    token: token,
+                    crypto_type: cryptoType,
+                    length: token.length
+                };
+                console.log("Enviando:", payload);
+                
+                const response = await fetch(`${API_BASE}/decrypt`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const responseData = await response.json();
+                console.log("Resposta recebida:", responseData);
+                console.log("Status:", response.status);
+
+                if (!response.ok) {
+                    let errorMsg = "Erro ao descriptografar";
+                    if (responseData.detail) {
+                        if (Array.isArray(responseData.detail)) {
+                            errorMsg = responseData.detail.map(e => e.msg).join(", ");
+                        } else {
+                            errorMsg = responseData.detail;
+                        }
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                document.getElementById("decryptResultText").textContent = responseData.text;
+                success.classList.add("show");
+                result.classList.add("show");
+            } catch (err) {
+                error.textContent = "❌ " + err.message;
+                error.classList.add("show");
+                console.error("Erro detalhado:", err);
+            } finally {
+                loading.style.display = "none";
+            }
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("✓ Copiado para a área de transferência!");
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,9 @@
-from src.config import logger, cipher, settings
+from src.config import logger, settings
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from src.models.schemas import TextInput, TextOutput, TokenInput, TokenOutput
+from src.crypto.factory import get_cipher
+import base64
 
 # INSTÂNCIA DA API =====================================================
 app = FastAPI(
@@ -9,6 +12,13 @@ app = FastAPI(
     version=settings.app_version,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, OPTIONS, etc.
+    allow_headers=["*"],  # Permite todos os headers
+)
 
 # ENDPOINTS ============================================================
 @app.get("/")
@@ -18,6 +28,7 @@ def root():
     """
     logger.info("Endpoint raiz acessado")
     return {"message": "Bem-vindo à SecureCipher API!", "version": settings.app_version}
+
 
 
 @app.get("/health")
@@ -42,14 +53,19 @@ def encrypt_text(data: TextInput) -> TextOutput:
     )
 
     try:
+        cipher = get_cipher(data.crypto_type)
         encrypted = cipher.encrypt(data.text.encode())
+        
+        # Codificar em base64 para retornar como string no JSON
+        token_b64 = base64.b64encode(encrypted).decode()
+        
         return TextOutput(
-            token=encrypted.decode(),
+            token=token_b64,
             crypto_type=settings.app_crypto_type,
             version=settings.app_version,
         )
     except Exception as e:
-        logger.warning("Erro ao criptografar o texto")
+        logger.warning(f"Erro ao criptografar o texto: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Erro ao criptografar o texto: {str(e)}"
         )
@@ -60,17 +76,22 @@ def decrypt_text(data: TokenInput) -> TokenOutput:
     """Endpoint para descriptografia do token informado para texto claro"""
     logger.info(
         "Solicitação de descriptografia recebida",
-        extra={"token": data.token, "length": data.length},
+        extra={"token": data.token, "length": data.length, "crypto_type": data.crypto_type},
     )
     try:
-        decrypted = cipher.decrypt(data.token.encode())
+        # Decodificar de base64 antes de descriptografar
+        encrypted_bytes = base64.b64decode(data.token)
+        
+        cipher = get_cipher(data.crypto_type)
+        decrypted = cipher.decrypt(encrypted_bytes)
+        
         return TokenOutput(
             text=decrypted.decode(),
             crypto_type=settings.app_crypto_type,
             version=settings.app_version,
         )
-    except Exception:
-        logger.warning("Erro ao descriptografar o token")
+    except Exception as e:
+        logger.warning(f"Erro ao descriptografar o token: {str(e)}")
         raise HTTPException(
             status_code=400, detail="Token inválido ou não pode ser descriptografado."
         )
