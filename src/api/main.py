@@ -16,9 +16,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, OPTIONS, etc.
-    allow_headers=["*"],  # Permite todos os headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 # ENDPOINTS ============================================================
 @app.get("/")
@@ -28,7 +29,6 @@ def root():
     """
     logger.info("Endpoint raiz acessado")
     return {"message": "Bem-vindo à SecureCipher API!", "version": settings.app_version}
-
 
 
 @app.get("/health")
@@ -55,13 +55,13 @@ def encrypt_text(data: TextInput) -> TextOutput:
     try:
         cipher = get_cipher(data.crypto_type)
         encrypted = cipher.encrypt(data.text.encode())
-        
+
         # Codificar em base64 para retornar como string no JSON
         token_b64 = base64.b64encode(encrypted).decode()
-        
+
         return TextOutput(
             token=token_b64,
-            crypto_type=settings.app_crypto_type,
+            crypto_type=data.crypto_type,
             version=settings.app_version,
         )
     except Exception as e:
@@ -76,18 +76,22 @@ def decrypt_text(data: TokenInput) -> TokenOutput:
     """Endpoint para descriptografia do token informado para texto claro"""
     logger.info(
         "Solicitação de descriptografia recebida",
-        extra={"token": data.token, "length": data.length, "crypto_type": data.crypto_type},
+        extra={
+            "token": data.token,
+            "length": data.length,
+            "crypto_type": data.crypto_type,
+        },
     )
     try:
         # Decodificar de base64 antes de descriptografar
         encrypted_bytes = base64.b64decode(data.token)
-        
+
         cipher = get_cipher(data.crypto_type)
         decrypted = cipher.decrypt(encrypted_bytes)
-        
+
         return TokenOutput(
             text=decrypted.decode(),
-            crypto_type=settings.app_crypto_type,
+            crypto_type=data.crypto_type,
             version=settings.app_version,
         )
     except Exception as e:

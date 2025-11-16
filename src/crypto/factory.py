@@ -1,41 +1,51 @@
 import os
-from os import getenv
 from typing import Protocol
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305, AESGCM
 from src.config import settings
 
+
 class CipherProto(Protocol):
     def encrypt(self, data: bytes) -> bytes: ...
     def decrypt(self, token: bytes) -> bytes: ...
 
+
 class FernetCipher:
     def __init__(self, key: bytes):
         self._f = Fernet(key)
+
     def encrypt(self, data: bytes) -> bytes:
         return self._f.encrypt(data)
+
     def decrypt(self, token: bytes) -> bytes:
         return self._f.decrypt(token)
+
 
 class AESGCMCipher:
     def __init__(self, key: bytes):
         self._a = AESGCM(key)
+
     def encrypt(self, data: bytes) -> bytes:
         nonce = os.urandom(12)
         return nonce + self._a.encrypt(nonce, data, None)
+
     def decrypt(self, token: bytes) -> bytes:
         nonce, ct = token[:12], token[12:]
         return self._a.decrypt(nonce, ct, None)
 
+
 class ChaChaCipher:
     def __init__(self, key: bytes):
         self._c = ChaCha20Poly1305(key)
+
     def encrypt(self, data: bytes) -> bytes:
         nonce = os.urandom(12)
         return nonce + self._c.encrypt(nonce, data, None)
+
     def decrypt(self, token: bytes) -> bytes:
         nonce, ct = token[:12], token[12:]
         return self._c.decrypt(nonce, ct, None)
+
 
 def get_cipher(crypto_type: str):
     """
@@ -49,7 +59,7 @@ def get_cipher(crypto_type: str):
 
     if "fernet" in t:
         key_str = settings.crypto_key_fernet
-        
+
         if not key_str:
             raise RuntimeError("CRYPTO_KEY_FERNET não encontrada no .env")
 
@@ -59,7 +69,7 @@ def get_cipher(crypto_type: str):
 
     if "aes" in t:
         key_str = settings.crypto_key_aes256
-       
+
         if not key_str:
             raise RuntimeError("CRYPTO_KEY_AES256 não encontrada no .env")
 
@@ -68,7 +78,7 @@ def get_cipher(crypto_type: str):
 
         if len(key_bytes) != 32:
             raise ValueError(f"AES-256 precisa de 32 bytes, recebeu {len(key_bytes)}")
-        
+
         return AESGCMCipher(key_bytes)
 
     if "chacha" in t:

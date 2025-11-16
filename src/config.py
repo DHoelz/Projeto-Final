@@ -8,15 +8,11 @@ class Settings(BaseSettings):
     app_name: str = "SecureCipher API"
     app_version: str = "1.0.0"
     app_description: str = (
-        "API que criptografa e decriptografa textos usando Fernet e chave via "
-        "variável de ambiente"
+        "API que criptografa e decriptografa textos usando Fernet, AES-256 ou ChaCha20."
     )
-    app_crypto_type: str = "Fernet"
-    # tornar todas as variantes de chave opcionais para que o Settings aceite
-    # CRYPTO_KEY_FERNET, CRYPTO_KEY_AES256, CRYPTO_KEY_CHACHA20
-    crypto_key_fernet: str | None = None
-    crypto_key_aes256: str | None = None
-    crypto_key_chacha20: str | None = None
+    crypto_key_fernet: str
+    crypto_key_aes256: str
+    crypto_key_chacha20: str
     debug: bool = False
 
     # carrega do .env e permite variáveis extras (não ignorar)

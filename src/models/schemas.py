@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 
+
 class TextInput(BaseModel):
     """
     Modelo de entrada para criptografar um texto.
@@ -7,11 +8,11 @@ class TextInput(BaseModel):
 
     text: str = Field(
         ...,
-        min_length=10,
-        description="Texto que será criptografado. Deve conter pelo menos 10 caracteres.",
+        description="Texto que será criptografado.",
     )
     crypto_type: str = Field(
-        ..., description="Tipo de criptografia a ser utilizada (Tipos suportados: 'fernet', aes, chacha)."
+        ...,
+        description="Tipo de criptografia a ser utilizada (Tipos suportados: 'fernet', aes, chacha).",
     )
     length: int = Field(
         ..., description="Comprimento do texto informado. Para validação ou metadados."
@@ -40,7 +41,7 @@ class TextOutput(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
-                "token": "gAAAAABlYwK9...",
+                "token": "gAAAAABpGcWRKnm31PMWpelUzlsj-xPeScERH1ekEr3MjtQug6jxe1hd5QJcoQFSMecb2Eh_UPvEt2tKmtzPns3qsTRYFBvk_u_LJxtoVTw53BoeiS5wdNpwKZ0XhRr9U_zVH2kAeeoK",
                 "crypto_type": "Fernet",
                 "version": "1.0.0",
             }
@@ -59,13 +60,16 @@ class TokenInput(BaseModel):
     length: int = Field(
         ..., description="Comprimento do token. Opcionalmente usado para validação."
     )
-    crypto_type: str = Field(..., description="Tipo de criptografia utilizada (Tipos suportados: 'fernet', aes, chacha).")
+    crypto_type: str = Field(
+        ...,
+        description="Tipo de criptografia utilizada (Tipos suportados: 'fernet', aes, chacha).",
+    )
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
                 "token": "gAAAAABpGcWRKnm31PMWpelUzlsj-xPeScERH1ekEr3MjtQug6jxe1hd5QJcoQFSMecb2Eh_UPvEt2tKmtzPns3qsTRYFBvk_u_LJxtoVTw53BoeiS5wdNpwKZ0XhRr9U_zVH2kAeeoK",
                 "length": 140,
-                "crypto_type": "fernet"
+                "crypto_type": "fernet",
             }
         }
     )
