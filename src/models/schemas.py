@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class TextInput(BaseModel):
@@ -9,15 +9,13 @@ class TextInput(BaseModel):
     crypto_type: str = Field(..., description="Tipo de criptografia a ser utilizada (ex: 'fernet').")
     length: int = Field(..., description="Comprimento do texto informado. Para validação ou metadados.")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                "text": "Texto de exemplo para criptografia",
-                "crypto_type": "fernet",
-                "length": 34
-            }
-        }
-
+                "text": "Mensagem de teste", 
+                "crypto_type": "fernet", 
+                "length": 17
+            }})
 
 class TextOutput(BaseModel):
     """
@@ -27,33 +25,27 @@ class TextOutput(BaseModel):
     crypto_type: str = Field(..., description="Tipo de criptografia aplicada.")
     version: str = Field(..., description="Versão da API.")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                "token": "gAAAAABlYwK9oU1k3H...",
-                "crypto_type": "fernet",
+                "token": "gAAAAABlYwK9...", 
+                "crypto_type": "Fernet", 
                 "version": "1.0.0"
-            }
-        }
+            }})
 
 
 class TokenInput(BaseModel):
     """
     Modelo de entrada para descriptografar um token.
     """
-    token: str = Field(
-        ...,
-        description="Token criptografado que será descriptografado."
-    )
+    token: str = Field(..., description="Token criptografado que será descriptografado.")
     length: int = Field(..., description="Comprimento do token. Opcionalmente usado para validação.")
-
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                "token": "gAAAAABlYwK9oU1k3H...",
+                "token": "gAAAAABpGcWRKnm31PMWpelUzlsj-xPeScERH1ekEr3MjtQug6jxe1hd5QJcoQFSMecb2Eh_UPvEt2tKmtzPns3qsTRYFBvk_u_LJxtoVTw53BoeiS5wdNpwKZ0XhRr9U_zVH2kAeeoK", 
                 "length": 140
-            }
-        }
+            }})
 
 
 class TokenOutput(BaseModel):
@@ -64,11 +56,10 @@ class TokenOutput(BaseModel):
     crypto_type: str = Field(..., description="Tipo de criptografia utilizada.")
     version: str = Field(..., description="Versão da API.")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
-                "text": "Texto de exemplo já descriptografado",
-                "crypto_type": "fernet",
+                "text": "Mensagem de teste", 
+                "crypto_type": "Fernet", 
                 "version": "1.0.0"
-            }
-        }
+            }})

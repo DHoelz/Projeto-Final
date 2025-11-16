@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from cryptography.fernet import Fernet
 
 # CONFIGURAÇÕES GERAIS =================================================
@@ -13,9 +13,7 @@ class Settings(BaseSettings):
     crypto_key: str
     debug: bool = False
     
-    class Config:
-        env_file = ".env"
-        extra = "ignore" 
+    model_config = SettingsConfigDict(env_file=".env") 
 
 settings = Settings()
 
