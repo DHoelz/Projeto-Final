@@ -12,6 +12,9 @@ app = FastAPI(
     version=settings.app_version,
 )
 
+logger.info("API iniciada com sucesso")
+
+# MIDDLEWARES ==========================================================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -42,7 +45,9 @@ def health_check():
 
 @app.post("/encrypt")
 def encrypt_text(data: TextInput) -> TextOutput:
-    """Endpoint responsável por criptografar o texto informado."""
+    """
+    Endpoint responsável por criptografar o texto informado.
+    """
     logger.info(
         "Solicitação de criptografia recebida",
         extra={
@@ -66,14 +71,14 @@ def encrypt_text(data: TextInput) -> TextOutput:
         )
     except Exception as e:
         logger.warning(f"Erro ao criptografar o texto: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail=f"Erro ao criptografar o texto: {str(e)}"
-        )
+        raise HTTPException(status_code=400, detail=f"Erro ao criptografar o texto: {str(e)}")
 
 
 @app.post("/decrypt")
 def decrypt_text(data: TokenInput) -> TokenOutput:
-    """Endpoint para descriptografia do token informado para texto claro"""
+    """
+    Endpoint para descriptografia do token informado para texto claro
+    """
     logger.info(
         "Solicitação de descriptografia recebida",
         extra={
@@ -96,6 +101,5 @@ def decrypt_text(data: TokenInput) -> TokenOutput:
         )
     except Exception as e:
         logger.warning(f"Erro ao descriptografar o token: {str(e)}")
-        raise HTTPException(
-            status_code=400, detail="Token inválido ou não pode ser descriptografado."
+        raise HTTPException(status_code=400, detail="Token inválido ou não pode ser descriptografado."
         )

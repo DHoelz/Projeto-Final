@@ -1,11 +1,27 @@
 # 🔐 SecureCipher API
 
-Uma API FastAPI para criptografia e descriptografia de textos usando o algoritmo **Fernet** (criptografia simétrica segura).
+Uma API FastAPI para criptografia e descriptografia de textos usando o algoritmo **Fernet, AES-256 e ChaCha20-Poly1305** (criptografia simétrica segura).
 
 ## 📋 Sobre o Projeto
 
+Trabalho final do módulo Introdução à Engenharia de Software aplicada a ML do IBMEC.
+
+### 1️⃣ Participantes
+
+  - Daniel Werneck
+  - Guilherme Matos
+  - David Passos
+  - Rafael Rocha
+
+### 2️⃣ Descrição do projeto
+
 SecureCipher é uma API RESTful que permite:
-- ✅ **Criptografar textos** com segurança usando Fernet
+- ✅ **Criptografar e Descriptografar textos** com segurança usando Fernet, AES-256 e ChaCha20-Poly1305
+- ✅ **Validação automática** de entrada com Pydantic
+- ✅ **Documentação interativa** via Swagger/OpenAPI
+
+SecureCipher é uma API RESTful que permite:
+- ✅ **Criptografar textos** com segurança usando Fernet, AES256 e ChaCha20
 - ✅ **Descriptografar tokens** criptografados
 - ✅ **Validação automática** de entrada com Pydantic
 - ✅ **Documentação interativa** via Swagger/OpenAPI
@@ -14,18 +30,23 @@ SecureCipher é uma API RESTful que permite:
 
 ```
 Projeto Final/
+├── frontend/
+│   ├── index.html               # Frontend da aplicação   
 ├── src/
 │   ├── api/
 │   │   └── main.py              # Endpoints da API
 │   ├── models/
 │   │   └── schemas.py           # Modelos Pydantic (validação)
-│   └── config.py                # Configurações da aplicação
+│   ├── config.py                # Configurações da aplicação
+│   └── crypto/
+│       └── factory.py           # Factory das cifras
+│       └── key_gen.py           # Gerador de chaves criptográficas
 ├── tests/
-│   └── test_*.py                # Testes automatizados
+│   └── test.py                  # Testes automatizados
+|   └── conftest.py              # Configurações para os testes automatizados
 ├── .env                         # Variáveis de ambiente
 ├── requirements.txt             # Dependências do projeto
-└── README.md
-```
+└── 
 
 ## 🚀 Como Usar
 
@@ -35,19 +56,28 @@ Projeto Final/
 pip install -r requirements.txt
 ```
 
-### 2️⃣ Configurar Variáveis de Ambiente
+### 2️⃣ Gerar Chaves Criptograficas e Configurar Variáveis de Ambiente
 
-Crie um arquivo `.env` na raiz do projeto:
+Antes de executar a API, é obrigatório gerar as chaves de criptografia utilizadas pelos algoritmos Fernet, AES-256 e ChaCha20.
 
-```env
-CRYPTO_KEY=sua_chave_fernet_aqui
+Para isso, crie um arquivo `.env` na raiz do projeto e execute o script de geração:
+
+```bash
+python src/crypto/key_gen.py
 ```
 
-> **Dica:** Gere uma chave Fernet com:
-> ```python
-> from cryptography.fernet import Fernet
-> print(Fernet.generate_key().decode())
-> ```
+Esse script criará automaticamente três chaves seguras e exibirá no terminal o bloco completo para ser adicionado ao seu arquivo `.env`, no seguinte formato:
+
+```env
+CRYPTO_KEY_FERNET="sua_chave_fernet_aqui"
+CRYPTO_KEY_AES256="sua_chave_aes256_aqui"
+CRYPTO_KEY_CHACHA20="sua_chave_chacha20_aqui"
+```
+
+Basta copiar o conteúdo gerado e colar no seu `.env` antes de iniciar a API.
+
+>**Importante:** Cada algoritmo utiliza sua própria chave e elas **não são intercambiáveis.**
+>Nunca reutilize a mesma chave para algoritmos diferentes.
 
 ### 3️⃣ Executar a API
 
@@ -72,13 +102,13 @@ pytest tests/ -v
 
 ### 🔐 POST `/encrypt`
 
-Criptografa um texto.
+Criptografa um texto, podendo ser utilizado as criptografias "fernet", "aes256" e "chacha20".
 
 **Request:**
 ```json
 {
   "text": "Texto que será criptografado",
-  "crypto_type": "fernet",
+  "crypto_type": "fernet", 
   "length": 34
 }
 ```
@@ -94,11 +124,12 @@ Criptografa um texto.
 
 ### 🔓 POST `/decrypt`
 
-Descriptografa um token.
+Descriptografa um token criptografado com "fernet", "aes256" e "chacha20".
 
 **Request:**
 ```json
 {
+  "crypto_type": "fernet", 
   "token": "gAAAAABlYwK9oU1k3H...",
   "length": 140
 }
@@ -120,19 +151,12 @@ Health check da API.
 **Response (200):**
 ```json
 {
-  "status": true,
-  "message": "API funcionando"
+  "status": "healthy",
+  "version": "1.0.0"
 }
 ```
 
 ## 🔧 Customização
-
-### Alterar Tipo de Criptografia
-
-Edite `src/config.py`:
-```python
-app_crypto_type: str = "Fernet"  # ou outro tipo
-```
 
 ### Adicionar Novos Endpoints
 
@@ -147,7 +171,7 @@ Edite `src/models/schemas.py` e estenda a classe `BaseModel` do Pydantic.
 - **FastAPI**: Framework web moderno
 - **Uvicorn**: Servidor ASGI
 - **Pydantic**: Validação de dados
-- **cryptography**: Algoritmos criptográficos (Fernet)
+- **cryptography**: Algoritmos criptográficos
 - **pytest**: Framework de testes
 
 ## 📝 Exemplo de Uso
@@ -161,12 +185,12 @@ curl -X POST http://localhost:8000/encrypt \
 # Descriptografar
 curl -X POST http://localhost:8000/decrypt \
   -H "Content-Type: application/json" \
-  -d '{"token": "gAAAAABlYwK9...", "length": 140}'
+  -d '{"token": "gAAAAABlYwK9...",  "crypto_type": "fernet", "length": 140}'
 ```
 
 ## ⚠️ Segurança
 
-- 🔐 A chave Fernet deve ser armazenada com segurança em variáveis de ambiente
+- 🔐 As chaves devem ser armazenadas com segurança em variáveis de ambiente
 - 🚫 Nunca commite o arquivo `.env` no repositório
 - ✅ Use HTTPS em produção
 
@@ -176,5 +200,4 @@ Projeto desenvolvido para fins educacionais na IBMEC.
 
 ---
 
-**Desenvolvido com ❤️ | FastAPI + Pydantic + Fernet**
-
+**Desenvolvido com ❤️ | FastAPI + Pydantic + Criptografia Simétrica**

@@ -7,9 +7,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "SecureCipher API"
     app_version: str = "1.0.0"
-    app_description: str = (
-        "API que criptografa e decriptografa textos usando Fernet, AES-256 ou ChaCha20."
-    )
+    app_description: str = ("API que criptografa e decriptografa textos usando Fernet, AES-256 ou" \
+                            "ChaCha20.")
     crypto_key_fernet: str
     crypto_key_aes256: str
     crypto_key_chacha20: str
