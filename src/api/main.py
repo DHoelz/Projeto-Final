@@ -71,7 +71,9 @@ def encrypt_text(data: TextInput) -> TextOutput:
         )
     except Exception as e:
         logger.warning(f"Erro ao criptografar o texto: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Erro ao criptografar o texto: {str(e)}")
+        raise HTTPException(
+            status_code=400, detail=f"Erro ao criptografar o texto: {str(e)}"
+        )
 
 
 @app.post("/decrypt")
@@ -101,5 +103,6 @@ def decrypt_text(data: TokenInput) -> TokenOutput:
         )
     except Exception as e:
         logger.warning(f"Erro ao descriptografar o token: {str(e)}")
-        raise HTTPException(status_code=400, detail="Token inválido ou não pode ser descriptografado."
+        raise HTTPException(
+            status_code=400, detail="Token inválido ou não pode ser descriptografado."
         )

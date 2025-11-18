@@ -20,7 +20,6 @@ SecureCipher é uma API RESTful que permite:
 - ✅ **Validação automática** de entrada com Pydantic
 - ✅ **Documentação interativa** via Swagger/OpenAPI
 
-
 ## 🏗️ Estrutura do Projeto
 
 ```
@@ -75,7 +74,6 @@ Basta copiar o conteúdo gerado e colar no seu `.env` antes de iniciar a API.
 >**Importante:** Cada algoritmo utiliza sua própria chave e elas **não são intercambiáveis.**
 >Nunca reutilize a mesma chave para algoritmos diferentes.
 
-
 ### 3️⃣ Executar a API
 
 ```bash
@@ -84,12 +82,27 @@ uvicorn src.api.main:app --reload
 
 A API estará disponível em `http://localhost:8000`
 
-### 4️⃣ Acessar Documentação
+### 4️⃣ Acessar o Frontend (opcional)
+
+Com a API em execução, você pode utilizar a interface web localizada em `frontend/index.html`.
+
+- Abra o arquivo diretamente no navegador (clicando duas vezes ou via *Open File*).
+- Ou sirva a pasta `frontend/` com um servidor HTTP simples, por exemplo:
+
+```bash
+cd frontend
+python -m http.server 5500
+```
+
+Em seguida, acesse no navegador:
+  - Frontend: http://localhost:5500
+
+### 5️⃣ Acessar Documentação
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-### 5️⃣ Rodar Testes
+### 6️⃣ Rodar Testes
 
 ```bash
 pytest tests/test.py -v

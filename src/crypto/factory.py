@@ -5,6 +5,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305, AESGCM
 from src.config import settings
 
+
 # PROTOCOLO DE CIPHERS =================================================
 class CipherProto(Protocol):
     def encrypt(self, data: bytes) -> bytes: ...
@@ -116,7 +117,7 @@ def get_cipher(crypto_type: str):
             raise ValueError(f"ChaCha20 precisa de 32 bytes, recebeu {len(key_bytes)}")
 
         return ChaChaCipher(key_bytes)
-    
+
     # ERRO POR TIPO NÃO SUPORTADO ======================================
     else:
         raise ValueError(f"Tipo de criptografia não suportado: {crypto_type}")

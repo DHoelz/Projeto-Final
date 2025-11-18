@@ -22,10 +22,11 @@ def main():
     # ChaCha20: 32 bytes, codificados em Base64
     chacha20_key = gerar_chave_base64(32)
 
-    print('# Adicione isso ao seu arquivo .env\n')
+    print("# Adicione isso ao seu arquivo .env\n")
     print(f'CRYPTO_KEY_FERNET="{fernet_key}"')
     print(f'CRYPTO_KEY_AES256="{aes256_key}"')
     print(f'CRYPTO_KEY_CHACHA20="{chacha20_key}"')
+
 
 if __name__ == "__main__":
     main()
