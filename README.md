@@ -1,6 +1,6 @@
 # 🔐 SecureCipher API
 
-Uma API FastAPI para criptografia e descriptografia de textos usando o algoritmo **Fernet, AES-256 e ChaCha20-Poly1305** (criptografia simétrica segura).
+Uma API FastAPI para criptografia e descriptografia de textos usando o algoritmo **Fernet**, **AES-256** e **ChaCha20-Poly1305** (criptografia simétrica segura).
 
 ## 📋 Sobre o Projeto
 
@@ -20,11 +20,6 @@ SecureCipher é uma API RESTful que permite:
 - ✅ **Validação automática** de entrada com Pydantic
 - ✅ **Documentação interativa** via Swagger/OpenAPI
 
-SecureCipher é uma API RESTful que permite:
-- ✅ **Criptografar textos** com segurança usando Fernet, AES256 e ChaCha20
-- ✅ **Descriptografar tokens** criptografados
-- ✅ **Validação automática** de entrada com Pydantic
-- ✅ **Documentação interativa** via Swagger/OpenAPI
 
 ## 🏗️ Estrutura do Projeto
 
@@ -47,6 +42,7 @@ Projeto Final/
 ├── .env                         # Variáveis de ambiente
 ├── requirements.txt             # Dependências do projeto
 └── 
+```
 
 ## 🚀 Como Usar
 
@@ -79,6 +75,12 @@ Basta copiar o conteúdo gerado e colar no seu `.env` antes de iniciar a API.
 >**Importante:** Cada algoritmo utiliza sua própria chave e elas **não são intercambiáveis.**
 >Nunca reutilize a mesma chave para algoritmos diferentes.
 
+> **Dica:** Gere uma chave AES-256 ou ChaCha20-Poly1305 com:
+> ```python
+> from Crypto.Random import get_random_bytes
+> print(get_random_bytes(32).hex())
+> ```
+
 ### 3️⃣ Executar a API
 
 ```bash
@@ -95,7 +97,7 @@ A API estará disponível em `http://localhost:8000`
 ### 5️⃣ Rodar Testes
 
 ```bash
-pytest tests/ -v
+pytest tests/test.py -v
 ```
 
 ## 📡 Endpoints
