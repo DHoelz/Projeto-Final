@@ -1,12 +1,20 @@
 # 🔐 SecureCipher API
 
-Uma API FastAPI para criptografia e descriptografia de textos usando o algoritmo **Fernet** (criptografia simétrica segura).
+Uma API FastAPI para criptografia e descriptografia de textos usando os algoritmos **Fernet**, **AES-256** e **ChaCha20-Poly1305** (criptografia simétrica segura).
 
 ## 📋 Sobre o Projeto
 
+Trabalho final do módulo Introdução à Engenharia de Software aplicada a ML  do IBMEC.
+
+### 1️⃣ Participantes
+  - Daniel Werneck
+  - Guilherme Matos
+  - David Passos
+
+### 2️⃣ Descrição do projeto
+
 SecureCipher é uma API RESTful que permite:
-- ✅ **Criptografar textos** com segurança usando Fernet
-- ✅ **Descriptografar tokens** criptografados
+- ✅ **Criptografar e Descriptografar textos** com segurança usando Fernet, AES-256 e ChaCha20-Poly1305
 - ✅ **Validação automática** de entrada com Pydantic
 - ✅ **Documentação interativa** via Swagger/OpenAPI
 
@@ -14,14 +22,19 @@ SecureCipher é uma API RESTful que permite:
 
 ```
 Projeto Final/
+├── frontend/
+│   ├── index.html               # Frontend da aplicação   
 ├── src/
 │   ├── api/
 │   │   └── main.py              # Endpoints da API
 │   ├── models/
 │   │   └── schemas.py           # Modelos Pydantic (validação)
-│   └── config.py                # Configurações da aplicação
+│   ├── config.py                # Configurações da aplicação
+│   └── crypto/
+│       └── factory.py           # Factory das cifras
 ├── tests/
-│   └── test_*.py                # Testes automatizados
+│   └── test.py                  # Testes automatizados
+|   └── conftest.py              # Configurações para os testes automatizados
 ├── .env                         # Variáveis de ambiente
 ├── requirements.txt             # Dependências do projeto
 └── README.md
@@ -40,13 +53,21 @@ pip install -r requirements.txt
 Crie um arquivo `.env` na raiz do projeto:
 
 ```env
-CRYPTO_KEY=sua_chave_fernet_aqui
+CRYPTO_KEY_FERNET=sua_chave_fernet_aqui
+CRYPTO_KEY_AES256=sua_chave_aes_aqui
+CRYPTO_KEY_CHACHA20=sua_chave_chacha20_aqui
 ```
 
 > **Dica:** Gere uma chave Fernet com:
 > ```python
 > from cryptography.fernet import Fernet
 > print(Fernet.generate_key().decode())
+> ```
+
+> **Dica:** Gere uma chave AES-256 ou ChaCha20-Poly1305 com:
+> ```python
+> from Crypto.Random import get_random_bytes
+> print(get_random_bytes(32).hex())
 > ```
 
 ### 3️⃣ Executar a API
@@ -65,20 +86,20 @@ A API estará disponível em `http://localhost:8000`
 ### 5️⃣ Rodar Testes
 
 ```bash
-pytest tests/ -v
+pytest tests/test.py -v
 ```
 
 ## 📡 Endpoints
 
 ### 🔐 POST `/encrypt`
 
-Criptografa um texto.
+Criptografa um texto, podendo ser utilizado as criptografias "fernet", "aes" e "chacha".
 
 **Request:**
 ```json
 {
   "text": "Texto que será criptografado",
-  "crypto_type": "fernet",
+  "crypto_type": "fernet", 
   "length": 34
 }
 ```
@@ -94,11 +115,12 @@ Criptografa um texto.
 
 ### 🔓 POST `/decrypt`
 
-Descriptografa um token.
+Descriptografa um token criptografado com "fernet", "aes" e "chacha".
 
 **Request:**
 ```json
 {
+  "crypto_type": "fernet", 
   "token": "gAAAAABlYwK9oU1k3H...",
   "length": 140
 }
@@ -120,19 +142,12 @@ Health check da API.
 **Response (200):**
 ```json
 {
-  "status": true,
-  "message": "API funcionando"
+  "version": "1.0.0",
+  "message": "Bem-vindo à SecureCipher API!"
 }
 ```
 
 ## 🔧 Customização
-
-### Alterar Tipo de Criptografia
-
-Edite `src/config.py`:
-```python
-app_crypto_type: str = "Fernet"  # ou outro tipo
-```
 
 ### Adicionar Novos Endpoints
 
@@ -147,7 +162,7 @@ Edite `src/models/schemas.py` e estenda a classe `BaseModel` do Pydantic.
 - **FastAPI**: Framework web moderno
 - **Uvicorn**: Servidor ASGI
 - **Pydantic**: Validação de dados
-- **cryptography**: Algoritmos criptográficos (Fernet)
+- **cryptography**: Algoritmos criptográficos
 - **pytest**: Framework de testes
 
 ## 📝 Exemplo de Uso
@@ -161,12 +176,12 @@ curl -X POST http://localhost:8000/encrypt \
 # Descriptografar
 curl -X POST http://localhost:8000/decrypt \
   -H "Content-Type: application/json" \
-  -d '{"token": "gAAAAABlYwK9...", "length": 140}'
+  -d '{"token": "gAAAAABlYwK9...",  "crypto_type": "fernet", "length": 140}'
 ```
 
 ## ⚠️ Segurança
 
-- 🔐 A chave Fernet deve ser armazenada com segurança em variáveis de ambiente
+- 🔐 As chaves devem ser armazenadas com segurança em variáveis de ambiente
 - 🚫 Nunca commite o arquivo `.env` no repositório
 - ✅ Use HTTPS em produção
 
