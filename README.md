@@ -156,6 +156,18 @@ Descriptografa um token criptografado com "fernet", "aes256" e "chacha20".
 
 ### 💚 GET `/`
 
+Raiz (Root) da aplicação com mensagem de boas vindas.
+
+**Response (200):**
+```json
+{
+  "message":"Bem-vindo à SecureCipher API!",
+  "version":"1.0.0"
+}
+```
+
+### 💚 GET `/health`
+
 Health check da API.
 
 **Response (200):**
